@@ -66,14 +66,14 @@ const Dashboard = () => {
         <div className="bg-white p-6 rounded-lg shadow-lg">
           {data ? (  // Memperbarui kondisi rendering untuk memeriksa data
           <div>
-            <ImageSlider />
+           
             <div className='grid grid-cols-2 gap-2 m-3'>
               <button onClick={buttonA} className="bg-blue-500 text-white p-4 md:p-[70px] duration-300 rounded-lg hover:bg-blue-600">
                 <div className='flex flex-col items-center'>
                 <RiProfileFill className='text-6xl'/> Profile
                 </div>
               </button>
-              <button className="bg-green-500 text-white p-4 md:p-[70px] rounded-lg duration-300 hover:bg-green-600">
+              <button className="bg-green-500 text-white p-4 md:p-[70px] rounded-lg duration-300 hover:bg-green-600" onClick={() => navigate('/dashboard/menu')}>
               <div className='flex flex-col items-center'>
                 <RiGalleryLine className='text-6xl'/> Gallery
                 </div>

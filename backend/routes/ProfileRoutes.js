@@ -9,7 +9,7 @@ import { verifyToken } from '../middleware/Auth.js';
 const router = express.Router();
 
 // Rute untuk mendapatkan profile
-router.get('/profile', verifyToken, getProfile);
+router.get('/profile', getProfile);
 
 // Rute untuk menambah atau mengupdate profile
 router.post('/profile', verifyToken, upsertProfile);
