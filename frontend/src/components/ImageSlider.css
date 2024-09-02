@@ -1,0 +1,25 @@
+/* src/components/ImageSlider.css */
+.swiper-slide {
+    width: 500px; /* Ubah width dari 300px ke 500px */
+    height: 400px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .swiper-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  @media (min-width: 768px) {
+    .swiper-slide {
+      width: 600px; /* Ubah ukuran slide pada layar yang lebih besar */
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .swiper-slide {
+      width: 700px; /* Tambahkan ukuran untuk layar yang lebih besar */
+    }
+  }  
