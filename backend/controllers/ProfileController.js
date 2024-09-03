@@ -17,31 +17,37 @@ export const getProfile = (req, res) => {
 export const upsertProfile = (req, res) => {
   const newProfile = req.body;
 
+  // Jika ada file yang diunggah, tambahkan path gambar ke objek newProfile
+  if (req.file) {
+      newProfile.image = `/uploads/${req.file.filename}`;
+  }
+
   Profile.getAll((err, profiles) => {
-    if (err) {
-      return res.status(500).json({ message: 'Error checking existing profiles', error: err });
-    }
-    
-    if (profiles.length === 0) {
-      // Jika tidak ada profile, tambahkan yang baru
-      Profile.create(newProfile, (err, insertId) => {
-        if (err) {
-          return res.status(500).json({ message: 'Error creating profile', error: err });
-        }
-        res.status(201).json({ message: 'Profile created successfully', id: insertId });
-      });
-    } else {
-      // Jika sudah ada profile, update yang sudah ada
-      const existingProfileId = profiles[0].id;
-      Profile.updateById(existingProfileId, newProfile, (err, affectedRows) => {
-        if (err) {
-          return res.status(500).json({ message: 'Error updating profile', error: err });
-        }
-        res.status(200).json({ message: 'Profile updated successfully' });
-      });
-    }
+      if (err) {
+          return res.status(500).json({ message: 'Error checking existing profiles', error: err });
+      }
+
+      if (profiles.length === 0) {
+          // Jika tidak ada profile, tambahkan yang baru
+          Profile.create(newProfile, (err, insertId) => {
+              if (err) {
+                  return res.status(500).json({ message: 'Error creating profile', error: err });
+              }
+              res.status(201).json({ message: 'Profile created successfully', id: insertId });
+          });
+      } else {
+          // Jika sudah ada profile, update yang sudah ada
+          const existingProfileId = profiles[0].id;
+          Profile.updateById(existingProfileId, newProfile, (err, affectedRows) => {
+              if (err) {
+                  return res.status(500).json({ message: 'Error updating profile', error: err });
+              }
+              res.status(200).json({ message: 'Profile updated successfully' });
+          });
+      }
   });
 };
+
 
 // Menghapus data profile
 export const deleteProfile = (req, res) => {

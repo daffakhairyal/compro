@@ -1,60 +1,96 @@
-// HeroCarousel.js
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import './HeroCarousel.css'; // Impor CSS khusus untuk efek fade
+import React, { useState, useEffect } from "react";
 
 const HeroCarousel = () => {
-  const [slides, setSlides] = useState([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [fade, setFade] = useState(true); // Menambahkan state untuk efek fade
+    const [slides, setSlides] = useState([]);
+    const [profile, setProfile] = useState([]);
+    const [currentSlide, setCurrentSlide] = useState(0);
+    const [fade, setFade] = useState(true);
 
-  useEffect(() => {
-    const fetchSlides = async () => {
-      try {
-        const response = await axios.get('http://localhost:5000/api/hero');
-        setSlides(response.data);
-      } catch (error) {
-        console.error('Error fetching hero data:', error);
-      }
-    };
+    useEffect(() => {
+        const fetchSlides = async () => {
+            try {
+                const response = await fetch("http://localhost:5000/api/hero");
+                const data = await response.json();
+                setSlides(data);
+            } catch (error) {
+                console.error("Error fetching slides:", error);
+            }
+        };
 
-    fetchSlides();
+        fetchSlides();
+    }, []);
 
-    const interval = setInterval(() => {
-      setFade(false); // Mulai efek fade out
-      setTimeout(() => {
-        setCurrentIndex((prevIndex) => (prevIndex + 1) % slides.length);
-        setFade(true); // Mulai efek fade in
-      }, 500); // Durasi fade out sebelum mengubah slide
-    }, 5000); // Ganti slide setiap 5 detik
+    useEffect(() => {
+      const fetchProfile = async () => {
+          try {
+              const response = await fetch("http://localhost:5000/api/profile");
+              const data = await response.json();
+              console.log(data)
+              setProfile(data);
+          } catch (error) {
+              console.error("Error fetching slides:", error);
+          }
+      };
 
-    return () => clearInterval(interval);
-  }, [slides.length]);
+      fetchProfile();
+  }, []);
 
-  return (
-    <div className="relative h-screen overflow-hidden">
-      {slides.length > 0 && (
-        <div
-          className={`absolute inset-0 transition-opacity duration-500 ${fade ? 'fade-in' : 'fade-out'} hero-background`} // Tambahkan kelas hero-background
-          style={{ backgroundImage: `url(http://localhost:5000${slides[currentIndex].image_url})` }} // Tambahkan URL dasar
-        >
-          <div className="flex flex-col justify-center items-center h-full bg-black bg-opacity-50">
-            <h2 className="text-4xl font-bold text-white">{slides[currentIndex].title}</h2>
-            <p className="mt-2 text-lg text-gray-300">{slides[currentIndex].description}</p>
-          </div>
+    useEffect(() => {
+        if (slides.length === 0) return;
+
+        const interval = setInterval(() => {
+            setFade(false);
+            setTimeout(() => {
+                setCurrentSlide((prev) => (prev === slides.length - 1 ? 0 : prev + 1));
+                setFade(true);
+            }, 500);
+        }, 5000);
+
+        return () => clearInterval(interval);
+    }, [currentSlide, slides.length]);
+
+    if (slides.length === 0) {
+        return <div className="flex items-center justify-center h-screen">Loading...</div>;
+    }
+
+    return (
+        <div className="relative w-full h-screen bg-gray-900 overflow-hidden">
+            {slides.map((slide, index) => {
+                const fullImageUrl = `http://localhost:5000${slide.image_url}`;
+                console.log("Full Image URL:", fullImageUrl); // Log the full URL
+
+                return (
+                    <div
+                        key={slide.id}
+                        className={`absolute inset-0 transition-opacity duration-500 ${
+                            index === currentSlide ? "opacity-100" : "opacity-0"
+                        } ${fade ? "fade-in" : "fade-out"}`}
+                    >
+                        <div
+                            className="w-full h-full bg-cover bg-center"
+                            style={{ backgroundImage: `url(${fullImageUrl})` }} // Use the full URL
+                        >
+                            <div className=" h-screen bg-black bg-opacity-50 p-5">
+                              <div className="h-screen flex flex-col-reverse md:flex-row items-center justify-center md:justify-around">
+                                <div className="text-center text-white px-4">
+                                    <h2 className="text-4xl md:text-6xl font-bold mb-4">
+                                        {slide.title}
+                                    </h2>
+                                    <p className="text-lg md:text-2xl">
+                                        {slide.description}
+                                    </p>
+                                </div>
+                                <div className="relative">
+                                <img src={`http://localhost:5000${profile.image}`} className="rounded w-[300px] md:w-[400px] h-[300px] md:h-[400px] rounded-full" alt="" />
+                                </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                );
+            })}
         </div>
-      )}
-      <div className="absolute bottom-5 left-1/2 transform -translate-x-1/2 flex space-x-2">
-        {slides.map((_, index) => (
-          <button
-            key={index}
-            className={`h-2 w-2 rounded-full ${currentIndex === index ? 'bg-white' : 'bg-gray-500'}`}
-            onClick={() => setCurrentIndex(index)}
-          />
-        ))}
-      </div>
-    </div>
-  );
+    );
 };
 
 export default HeroCarousel;

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import ProfileCard from './ProfileCard';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const Profile = () => {
@@ -18,6 +19,35 @@ const Profile = () => {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [data, setData] = useState(null); // Set awal ke null
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        navigate('/login');
+        return; // Hentikan eksekusi jika tidak ada token
+      }
+
+      try {
+        const response = await axios.get('http://localhost:5000/auth/me', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setData(response.data);
+      } catch (error) {
+        console.error('Error fetching data', error);
+        // Menangani kesalahan jika terjadi, misalnya jika token tidak valid
+        if (error.response && error.response.status === 403) {
+          localStorage.removeItem('token');
+          navigate('/login');
+        }
+      }
+    };
+
+    fetchData();
+  }, [navigate]);
+
 
   // Ambil token dari local storage atau state global
   const token = localStorage.getItem('token'); // Ganti dengan metode yang sesuai untuk mengambil token
